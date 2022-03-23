@@ -1,10 +1,11 @@
 /// [JSON Web Encryption](https://tools.ietf.org/html/rfc7516)
 library jose.jwe;
 
-import 'jose.dart';
-import 'util.dart';
-import 'jwk.dart';
 import 'dart:typed_data';
+
+import 'jose.dart';
+import 'jwk.dart';
+import 'util.dart';
 
 /// JSON Web Encryption (JWE) represents encrypted content using JSON-based data
 /// structures
@@ -143,7 +144,13 @@ class JsonWebEncryption extends JoseObject {
     }
     var cek = header.algorithm == 'dir'
         ? key
-        : key.unwrapKey(recipient.data, algorithm: header.algorithm);
+        : header.algorithm!
+                .startsWith('ECDH') // TODO: handling of missing pieces
+            ? key.unwrapKey(recipient.data,
+                algorithm: header.algorithm,
+                encryptionAlgorithm: header.encryptionAlgorithm,
+                epk: JsonWebKey.fromJson(header['epk']!))
+            : key.unwrapKey(recipient.data, algorithm: header.algorithm);
     return cek.decrypt(data,
         initializationVector: initializationVector,
         additionalAuthenticatedData: Uint8List.fromList(aad.codeUnits),

@@ -326,12 +326,40 @@ class JsonWebKey extends JsonObject {
     return v.data;
   }
 
+  // Helpers for ECDH-ES
+  static Uint8List _computerOtherInfo(
+      String _encryptionAlgorithmName, int _keybitLength) {
+    var l = _encryptionAlgorithmName.codeUnits.length.toUnsigned(32);
+    var ll = _convertToBigEndian(l);
+    var a = Uint8List.fromList(_encryptionAlgorithmName.codeUnits);
+    //TODO: add apu, apv, fixed to empty for now
+    var zero = _convertToBigEndian(0);
+    var k = _convertToBigEndian(_keybitLength);
+    return Uint8List.fromList([...ll, ...a, ...zero, ...zero, ...k]);
+  }
+
+  static Uint8List _convertToBigEndian(int l) {
+    var ll = Uint8List(4);
+    ll[0] = (l >> 24) & 255;
+    ll[1] = (l >> 16) & 255;
+    ll[2] = (l >> 8) & 255;
+    ll[3] = (l) & 255;
+    return ll;
+  }
+
   /// Decrypt key and validate decryption, if applicable
-  JsonWebKey unwrapKey(List<int> data, {String? algorithm}) {
+  JsonWebKey unwrapKey(List<int> data,
+      {String? algorithm, String? encryptionAlgorithm, JsonWebKey? epk}) {
     _assertCanDo('unwrapKey');
     algorithm ??= this.algorithm;
-    var decrypter =
-        _keyPair.privateKey!.createEncrypter(_getAlgorithm(algorithm));
+    var decrypter;
+    if (epk != null) {
+      decrypter = _getECDH_ES_encryptor(encryptionAlgorithm, decrypter,
+          algorithm, epk.cryptoKeyPair.publicKey as EcPublicKey);
+    } else {
+      decrypter =
+          _keyPair.privateKey!.createEncrypter(_getAlgorithm(algorithm));
+    }
     var v = decrypter.decrypt(EncryptionResult(data as Uint8List));
     return JsonWebKey.fromJson({
       'kty': 'oct',
@@ -339,6 +367,17 @@ class JsonWebKey extends JsonObject {
       'use': 'enc',
       'keyOperations': ['encrypt', 'decrypt']
     });
+  }
+
+  Encrypter _getECDH_ES_encryptor(String? encryptionAlgorithm, decrypter,
+      String? algorithm, EcPublicKey epk) {
+    final keysize =
+        JsonWebAlgorithm.getByName(encryptionAlgorithm).minKeyBitLength!;
+    decrypter = _keyPair.privateKey!.createEncrypter(_getAlgorithm(algorithm),
+        keysize: keysize,
+        ecPublicKey: epk,
+        otherInfo: _computerOtherInfo(encryptionAlgorithm!, keysize));
+    return decrypter;
   }
 
   /// Returns true if this key can be used with the JSON Web Algorithm

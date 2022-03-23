@@ -69,6 +69,7 @@ class JsonWebAlgorithm {
     ps384,
     ps512,
 */
+    ecdh_es,
     rsa1_5,
     rsa_oaep,
     rsa_oaep_256,
@@ -121,7 +122,7 @@ class JsonWebAlgorithm {
 
   /// ECDSA using brainpool256r1 and SHA-256
   static const bp256r1 =
-  JsonWebAlgorithm('BP256R1', type: 'EC', use: 'sig', curve: 'BP-256R1');
+      JsonWebAlgorithm('BP256R1', type: 'EC', use: 'sig', curve: 'BP-256R1');
 
 /* TODO: not supported yet in crypto_keys
   /// RSASSA-PSS using SHA-256 and MGF1 with SHA-256
@@ -148,6 +149,9 @@ class JsonWebAlgorithm {
   /// RSAES OAEP using SHA-256 and MGF1 with SHA-256
   static const rsa_oaep_256 = JsonWebAlgorithm('RSA-OAEP-256',
       type: 'RSA', use: 'key', minKeyBitLength: 2048);
+
+  static const ecdh_es =
+      JsonWebAlgorithm('ECDH-ES', type: 'EC', use: 'key', minKeyBitLength: 128);
 
   /// AES Key Wrap with default initial value using 128-bit key
   static const a128kw =
