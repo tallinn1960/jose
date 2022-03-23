@@ -365,6 +365,7 @@ class JsonWebKey extends JsonObject {
       'kty': 'oct',
       'k': encodeBase64EncodedBytes(v),
       'use': 'enc',
+      if (encryptionAlgorithm != null) 'alg': encryptionAlgorithm,
       'keyOperations': ['encrypt', 'decrypt']
     });
   }

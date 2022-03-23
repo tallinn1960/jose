@@ -3,6 +3,8 @@ library jose.jwe;
 
 import 'dart:typed_data';
 
+import 'package:crypto_keys/crypto_keys.dart';
+
 import 'jose.dart';
 import 'jwk.dart';
 import 'util.dart';
@@ -181,6 +183,14 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
   /// Authentication Tag.
   String? encryptionAlgorithm = 'A128CBC-HS256';
 
+  JsonWebKey? _ephemeral;
+
+  void generateEphemeral(String curve) {
+    var k = KeyPair.generateEc(curvesByName[curve]!);
+    _ephemeral = JsonWebKey.fromCryptoKeys(
+        publicKey: k.publicKey, privateKey: k.privateKey);
+  }
+
   @override
   JsonWebEncryption build() {
     if (encryptionAlgorithm == null) {
@@ -215,14 +225,33 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
         cek =
             JsonWebKey.fromJson({'alg': encryptionAlgorithm, ...key.toJson()});
       }
-      var encryptedKey = algorithm == 'dir'
+      var unprotectedHeaderParams = <String, dynamic>{'alg': algorithm};
+      if (algorithm == 'ECDH-ES') {
+        if (recipients.length > 1) {
+          throw StateError(
+              'JWE can only have one recipient when using encryption with ECDH-ES.');
+        }
+        if (_ephemeral == null) {
+          throw StateError('Ephemeral needed for ECDH-ES.');
+        }
+        var epk = _ephemeral!;
+
+        cek = epk.unwrapKey(Uint8List(0),
+            algorithm: "ECDH-ES",
+            encryptionAlgorithm: encryptionAlgorithm,
+            epk: key);
+        unprotectedHeaderParams['epk'] =
+            JsonWebKey.fromCryptoKeys(publicKey: epk.cryptoKeyPair.publicKey!)
+                .toJson();
+      }
+
+      var encryptedKey = (algorithm == 'dir' || algorithm == "ECDH-ES")
           ? const <int>[]
           : key.wrapKey(
               cek,
               algorithm: algorithm,
             );
 
-      var unprotectedHeaderParams = <String, dynamic>{'alg': algorithm};
       if (key.keyId != null) {
         unprotectedHeaderParams['kid'] = key.keyId;
       }
