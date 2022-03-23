@@ -183,11 +183,13 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
   /// Authentication Tag.
   String? encryptionAlgorithm = 'A128CBC-HS256';
 
-  JsonWebKey? _ephemeral;
-
-  void generateEphemeral(String curve) {
-    var k = KeyPair.generateEc(curvesByName[curve]!);
-    _ephemeral = JsonWebKey.fromCryptoKeys(
+  JsonWebKey _generateEphemeral(JsonWebKey forKey) {
+    if (forKey.keyType != 'EC') {
+      throw StateError('Ephemeral generation needs public EC Key');
+    }
+    var ecKey = forKey.cryptoKeyPair.publicKey! as EcPublicKey;
+    var k = KeyPair.generateEc(ecKey.curve);
+    return JsonWebKey.fromCryptoKeys(
         publicKey: k.publicKey, privateKey: k.privateKey);
   }
 
@@ -231,13 +233,10 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
           throw StateError(
               'JWE can only have one recipient when using encryption with ECDH-ES.');
         }
-        if (_ephemeral == null) {
-          throw StateError('Ephemeral needed for ECDH-ES.');
-        }
-        var epk = _ephemeral!;
+        var epk = _generateEphemeral(key);
 
         cek = epk.unwrapKey(Uint8List(0),
-            algorithm: "ECDH-ES",
+            algorithm: 'ECDH-ES',
             encryptionAlgorithm: encryptionAlgorithm,
             epk: key);
         unprotectedHeaderParams['epk'] =
@@ -245,7 +244,7 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
                 .toJson();
       }
 
-      var encryptedKey = (algorithm == 'dir' || algorithm == "ECDH-ES")
+      var encryptedKey = (algorithm == 'dir' || algorithm == 'ECDH-ES')
           ? const <int>[]
           : key.wrapKey(
               cek,

@@ -9,11 +9,15 @@ environment:
 
 dependencies:
   crypto_keys:
-    path: ../crypto_keys
+    git:
+      url: https://github.com/tallinn1960/crypto_keys.git
+      ref: develop
   meta: ^1.1.6
   typed_data: ^1.0.0
   x509:
-    path: ../x509
+    git:
+      url: https://github.com/tallinn1960/x509.git
+      ref: develop
   http: ^0.13.0
   http_parser: ^4.0.0
   asn1lib: ^1.0.0

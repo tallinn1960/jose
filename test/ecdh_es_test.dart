@@ -26,8 +26,7 @@ void main() {
   test('Encrypt and decrypt JWE using ECDH-ES and A256GCM', () async {
     var jweb = JsonWebEncryptionBuilder();
     jweb.stringContent = teststring;
-    jweb.addRecipient(jwk, algorithm: 'ECDH-ES');
-    jweb.generateEphemeral('P-256');
+    jweb.addRecipient(jwk);
     jweb.encryptionAlgorithm = 'A256GCM';
 
     var jwe = jweb.build();

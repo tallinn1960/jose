@@ -1,13 +1,15 @@
 /// [JSON Object Signing and Encryption](https://tools.ietf.org/html/rfc7515)
 library jose.jose;
 
-import 'util.dart';
-import 'jws.dart';
-import 'jwe.dart';
-import 'jwk.dart';
 import 'dart:async';
 import 'dart:convert' as convert;
+
 import 'package:meta/meta.dart';
+
+import 'jwe.dart';
+import 'jwk.dart';
+import 'jws.dart';
+import 'util.dart';
 
 /// Contains the `JSON Object Signing and Encryption` header parameters for
 /// [JsonWebSignature] and [JsonWebEncryption]
@@ -385,6 +387,7 @@ abstract class JoseObjectBuilder<T extends JoseObject> {
   /// that use different keys. The compact serialization as a string can only
   /// have one recipient however.
   void addRecipient(JsonWebKey? key, {String? algorithm}) {
+    algorithm ??= key?.keyType == 'EC' ? 'ECDH-ES' : null;
     recipients.add({'_jwk': key, 'alg': algorithm});
   }
 
