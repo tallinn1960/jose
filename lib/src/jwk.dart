@@ -354,8 +354,8 @@ class JsonWebKey extends JsonObject {
     algorithm ??= this.algorithm;
     var decrypter;
     if (epk != null) {
-      decrypter = _getECDH_ES_encryptor(encryptionAlgorithm, decrypter,
-          algorithm, epk.cryptoKeyPair.publicKey as EcPublicKey);
+      decrypter = _getECDH_ES_encryptor(encryptionAlgorithm, algorithm,
+          epk.cryptoKeyPair.publicKey as EcPublicKey);
     } else {
       decrypter =
           _keyPair.privateKey!.createEncrypter(_getAlgorithm(algorithm));
@@ -370,11 +370,12 @@ class JsonWebKey extends JsonObject {
     });
   }
 
-  Encrypter _getECDH_ES_encryptor(String? encryptionAlgorithm, decrypter,
-      String? algorithm, EcPublicKey epk) {
+  Encrypter _getECDH_ES_encryptor(
+      String? encryptionAlgorithm, String? algorithm, EcPublicKey epk) {
     final keysize =
         JsonWebAlgorithm.getByName(encryptionAlgorithm).minKeyBitLength!;
-    decrypter = _keyPair.privateKey!.createEncrypter(_getAlgorithm(algorithm),
+    var decrypter = _keyPair.privateKey!.createEncrypter(
+        _getAlgorithm(algorithm),
         keysize: keysize,
         ecPublicKey: epk,
         otherInfo: _computerOtherInfo(encryptionAlgorithm!, keysize));
