@@ -1,6 +1,8 @@
+import 'dart:io';
+
+import 'package:jose/src/jose.dart';
 import 'package:jose/src/jwk.dart';
 import 'package:jose/src/jws.dart';
-import 'package:jose/src/jose.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -215,6 +217,16 @@ void main() {
               .stringContent,
           payload);
     });
+  });
+
+  test('sign with brainpool key', () {
+    var jwk =
+        JsonWebKey.fromPem(File('test/pem/Priv_SIG.pem').readAsStringSync());
+    var jwsb = JsonWebSignatureBuilder()..addRecipient(jwk);
+    jwsb.stringContent = 'test';
+    var jws = jwsb.build();
+    var headers = jws.commonProtectedHeader.toJson();
+    expect(headers['alg'], 'BP256R1');
   });
 }
 

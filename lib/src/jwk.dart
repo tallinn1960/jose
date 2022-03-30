@@ -422,7 +422,8 @@ class JsonWebKey extends JsonObject {
     if (!usableForOperation(operation)) return null;
     if (algorithm != null) return algorithm;
 
-    return JsonWebAlgorithm.find(operation: operation, keyType: keyType)
+    return JsonWebAlgorithm.find(
+            operation: operation, keyType: keyType, curve: toJson()['crv'])
         .firstWhereOrNull((element) => true)
         ?.name;
   }

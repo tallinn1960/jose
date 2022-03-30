@@ -41,13 +41,16 @@ class JsonWebAlgorithm {
   }
 
   static Iterable<JsonWebAlgorithm> find(
-      {String? operation, String? keyType}) sync* {
+      {String? operation, String? keyType, String? curve}) sync* {
     for (var a in allAlgorithms) {
       if (operation != null) {
         if (!a.keyOperations.contains(operation)) continue;
       }
       if (keyType != null) {
         if (a.type != keyType) continue;
+      }
+      if (curve != null) {
+        if (a.curve != curve) continue;
       }
       yield a;
     }
