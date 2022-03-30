@@ -49,7 +49,7 @@ class JsonWebAlgorithm {
       if (keyType != null) {
         if (a.type != keyType) continue;
       }
-      if (curve != null) {
+      if (keyType == 'EC' && operation == 'sign' && curve != null) {
         if (a.curve != curve) continue;
       }
       yield a;
@@ -239,7 +239,7 @@ class JsonWebAlgorithm {
         'd': encodeBigInt((keyPair.privateKey as EcPrivateKey).eccPrivateKey),
         'x': encodeBigInt((keyPair.publicKey as EcPublicKey).xCoordinate),
         'y': encodeBigInt((keyPair.publicKey as EcPublicKey).yCoordinate),
-        'crv': curve,
+        'crv': curve ?? "P-256",
       },
       'alg': name,
       'use': use,
@@ -260,7 +260,7 @@ class JsonWebAlgorithm {
       case 'RSA':
         return KeyPair.generateRsa(bitStrength: _getKeyBitLength(keyBitLength));
       case 'EC':
-        return KeyPair.generateEc(curvesByName[curve!]!);
+        return KeyPair.generateEc(curvesByName[curve ?? 'P-256']!);
     }
     throw UnsupportedError('Algorithms of type \'$type\' not supported');
   }

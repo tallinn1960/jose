@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:jose/jose.dart';
 import 'package:test/test.dart';
@@ -35,5 +36,15 @@ void main() {
     var s =
         (await jwe2.getPayload(JsonWebKeyStore()..addKey(jwk))).stringContent;
     assert(s.compareTo(teststring) == 0);
+  });
+
+  test('Encrypt JWE using ECDH-ES with brainpool key', () {
+    var jweb = JsonWebEncryptionBuilder();
+    jweb.stringContent = teststring;
+    jweb.addRecipient(JsonWebKey.fromPem(
+        File('test/pem/bp_enc_key.pub.pem').readAsStringSync()));
+    jweb.encryptionAlgorithm = 'A256GCM';
+    var jwe = jweb.build();
+    expect(jwe.commonProtectedHeader.algorithm, 'ECDH-ES');
   });
 }
