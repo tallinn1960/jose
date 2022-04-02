@@ -128,11 +128,11 @@ class JsonWebEncryption extends JoseObject {
   }
 
   @override
-  List<int>? getPayloadFor(
+  Future<List<int>?> getPayloadFor(
     JsonWebKey? key,
     JoseHeader header,
     JoseRecipient recipient,
-  ) {
+  ) async {
     if (key == null) {
       return null;
     }

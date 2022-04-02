@@ -256,7 +256,7 @@ void _doTests(dynamic payload, dynamic key, dynamic encoded,
   }
 
   test('decode', () async {
-    _expectPayload(jws, allowedAlgorithms: allowedAlgorithms);
+    await _expectPayload(jws, allowedAlgorithms: allowedAlgorithms);
     if (encoded is String) {
       expect(jws.toCompactSerialization(), encoded);
     } else {

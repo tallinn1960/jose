@@ -275,7 +275,8 @@ class JsonWebKey extends JsonObject {
   }
 
   /// Verify digital signature or MAC
-  bool verify(List<int> data, List<int> signature, {String? algorithm}) {
+  Future<bool> verify(List<int> data, List<int> signature,
+      {String? algorithm}) async {
     _assertCanDo('verify');
     var verifier = _keyPair.publicKey!.createVerifier(_getAlgorithm(algorithm));
     return verifier.verify(

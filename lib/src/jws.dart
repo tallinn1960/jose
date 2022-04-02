@@ -73,11 +73,11 @@ class JsonWebSignature extends JoseObject {
   JosePayload get unverifiedPayload => JosePayload(data, commonHeader);
 
   @override
-  List<int>? getPayloadFor(
+  Future<List<int>?> getPayloadFor(
     JsonWebKey? key,
     JoseHeader header,
     JoseRecipient recipient,
-  ) {
+  ) async {
     if (header.algorithm == 'none') {
       return key == null && recipient.data.isEmpty ? this.data : null;
     }
@@ -91,7 +91,7 @@ class JsonWebSignature extends JoseObject {
     var encodedPayload = encodeBase64EncodedBytes(this.data);
     var data = convert.utf8.encode('$encodedHeader.$encodedPayload');
 
-    return key.verify(data, recipient.data, algorithm: header.algorithm)
+    return await key.verify(data, recipient.data, algorithm: header.algorithm)
         ? this.data
         : null;
   }

@@ -282,8 +282,8 @@ void main() {
 
     var jwe = await builder.build();
     expect(
-        utf8.decode(
-            jwe.getPayloadFor(jwk, jwe.commonHeader, jwe.recipients.first)!),
+        utf8.decode((await jwe.getPayloadFor(
+            jwk, jwe.commonHeader, jwe.recipients.first))!),
         '{"aud": "somekey", "sub": 12, "iss": "auth.example.com", "exp": 1617349353}');
   });
 }

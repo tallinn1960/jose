@@ -26,7 +26,7 @@ void main() {
         switch (a.use) {
           case 'sig':
             var signature = await key.sign(data);
-            expect(key.verify(data, signature), isTrue);
+            expect(await key.verify(data, signature), isTrue);
             break;
           case 'enc':
             var encrypted = key.encrypt(data);

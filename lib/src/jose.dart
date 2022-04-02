@@ -225,7 +225,7 @@ abstract class JoseObject {
                 : 'unwrapKey',
       )) {
         try {
-          var payload = getPayloadFor(key, header, r);
+          var payload = await getPayloadFor(key, header, r);
 
           if (payload != null) {
             return JosePayload(payload, _protectedHeaderFor(r));
@@ -240,7 +240,7 @@ abstract class JoseObject {
   }
 
   @protected
-  List<int>? getPayloadFor(
+  Future<List<int>?> getPayloadFor(
     JsonWebKey? key,
     JoseHeader header,
     JoseRecipient recipient,
