@@ -204,7 +204,7 @@ void main() {
       var builder = JsonWebSignatureBuilder()..content = payload;
 
       builder.addRecipient(null, algorithm: 'none');
-      var jws = builder.build();
+      var jws = await builder.build();
 
       var keyStore = JsonWebKeyStore();
       jws = JsonWebSignature.fromCompactSerialization(
@@ -219,12 +219,12 @@ void main() {
     });
   });
 
-  test('sign with brainpool key', () {
+  test('sign with brainpool key', () async {
     var jwk =
         JsonWebKey.fromPem(File('test/pem/Priv_SIG.pem').readAsStringSync());
     var jwsb = JsonWebSignatureBuilder()..addRecipient(jwk);
     jwsb.stringContent = 'test';
-    var jws = jwsb.build();
+    var jws = await jwsb.build();
     var headers = jws.commonProtectedHeader.toJson();
     expect(headers['alg'], 'BP256R1');
   });
@@ -255,7 +255,7 @@ void _doTests(dynamic payload, dynamic key, dynamic encoded,
     }
   }
 
-  test('decode', () {
+  test('decode', () async {
     _expectPayload(jws, allowedAlgorithms: allowedAlgorithms);
     if (encoded is String) {
       expect(jws.toCompactSerialization(), encoded);
@@ -277,7 +277,7 @@ void _doTests(dynamic payload, dynamic key, dynamic encoded,
       }
     }
 
-    var jws = builder.build();
+    var jws = await builder.build();
 
     if (encoded is String) jws.toCompactSerialization();
     await _expectPayload(jws, allowedAlgorithms: allowedAlgorithms);

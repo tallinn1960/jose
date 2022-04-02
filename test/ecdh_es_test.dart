@@ -30,7 +30,7 @@ void main() {
     jweb.addRecipient(jwk);
     jweb.encryptionAlgorithm = 'A256GCM';
 
-    var jwe = jweb.build();
+    var jwe = await jweb.build();
     var jwes = jwe.toCompactSerialization();
     var jwe2 = JsonWebEncryption.fromCompactSerialization(jwes);
     var s =
@@ -38,13 +38,13 @@ void main() {
     assert(s.compareTo(teststring) == 0);
   });
 
-  test('Encrypt JWE using ECDH-ES with brainpool key', () {
+  test('Encrypt JWE using ECDH-ES with brainpool key', () async {
     var jweb = JsonWebEncryptionBuilder();
     jweb.stringContent = teststring;
     jweb.addRecipient(JsonWebKey.fromPem(
         File('test/pem/bp_enc_key.pub.pem').readAsStringSync()));
     jweb.encryptionAlgorithm = 'A256GCM';
-    var jwe = jweb.build();
+    var jwe = await jweb.build();
     expect(jwe.commonProtectedHeader.algorithm, 'ECDH-ES');
   });
 }

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:test/test.dart';
 import 'package:jose/src/jwe.dart';
 import 'package:jose/src/jwk.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('JWE Examples from RFC7516', () {
@@ -209,7 +209,7 @@ void main() {
       var keyStore = JsonWebKeyStore()..addKey(key);
 
       builder.addRecipient(key, algorithm: 'dir');
-      var jwe = builder.build();
+      var jwe = await builder.build();
 
       jwe = JsonWebEncryption.fromCompactSerialization(
           jwe.toCompactSerialization());
@@ -280,7 +280,7 @@ void main() {
     builder.addRecipient(jwk, algorithm: 'dir');
     builder.encryptionAlgorithm = 'A256GCM';
 
-    var jwe = builder.build();
+    var jwe = await builder.build();
     expect(
         utf8.decode(
             jwe.getPayloadFor(jwk, jwe.commonHeader, jwe.recipients.first)!),
@@ -335,7 +335,7 @@ void _doTests(dynamic payload, dynamic key, dynamic encoded) {
       }
     }
 
-    jwe = builder.build();
+    jwe = await builder.build();
 
     if (encoded is String) jwe.toCompactSerialization();
     await _expectPayload(jwe);

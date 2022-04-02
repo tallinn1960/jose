@@ -194,7 +194,7 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
   }
 
   @override
-  JsonWebEncryption build() {
+  Future<JsonWebEncryption> build() async {
     if (encryptionAlgorithm == null) {
       throw StateError('No encryption algorithm set');
     }

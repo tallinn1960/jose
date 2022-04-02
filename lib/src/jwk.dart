@@ -267,10 +267,10 @@ class JsonWebKey extends JsonObject {
   String? get x509CertificateSha256Thumbprint => this['x5t#S256'];
 
   /// Compute digital signature or MAC
-  List<int> sign(List<int> data, {String? algorithm}) {
+  Future<List<int>> sign(List<int> data, {String? algorithm}) async {
     _assertCanDo('sign');
     var signer = _keyPair.privateKey!.createSigner(_getAlgorithm(algorithm));
-    var signature = signer.sign(data);
+    var signature = await signer.sign(data);
     return signature.data;
   }
 
