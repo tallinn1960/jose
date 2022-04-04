@@ -189,14 +189,15 @@ class JsonWebSignatureBuilder extends JoseObjectBuilder<JsonWebSignature> {
     }
 
     var signatures2 = <_JwsRecipient>[];
-    recipients.forEach((r) async {
+    for (var r in recipients) {
       var key = r['_jwk'];
       var algorithm = r['alg'];
       var re = await _JwsRecipient._sign(
           payload.data, payload.protectedHeader!, key,
           algorithm: algorithm, protectAll: recipients.length == 1);
       signatures2.add(re);
-    });
+    }
+
     return JsonWebSignature._(payload.data, signatures2);
   }
 }
