@@ -1,6 +1,7 @@
 /// [JSON Web Encryption](https://tools.ietf.org/html/rfc7516)
 library jose.jwe;
 
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto_keys/crypto_keys.dart';
@@ -273,6 +274,8 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
       aad += '.${String.fromCharCodes(additionalAuthenticatedData!)}';
     }
     var encryptedData = cek.encrypt(data!,
+        initializationVector: Uint8List.fromList(
+            List.generate(12, (_) => Random.secure().nextInt(256))),
         additionalAuthenticatedData: Uint8List.fromList(aad.codeUnits));
     return JsonWebEncryption._(encryptedData.data, _recipients,
         protectedHeader: protectedHeader,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:jose/jose.dart';
+import 'package:jose/src/jwe.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -46,5 +47,31 @@ void main() {
     jweb.encryptionAlgorithm = 'A256GCM';
     var jwe = await jweb.build();
     expect(jwe.commonProtectedHeader.algorithm, 'ECDH-ES');
+    var jweb2 = JsonWebEncryption.fromCompactSerialization(
+        jwe.toCompactSerialization());
+    var result = await jweb2.getPayload(JsonWebKeyStore()
+      ..addKey(JsonWebKey.fromJson(jsonDecode(
+          '{"kty":"EC","crv":"BP-256","x":"WBmQdqmB2_l97AfM1X0_rr8T0sty_q8-xXXOrPcIrkk","y":"GiP9hUuoqlHalH45aMlUVwJzWbCCeQbWNFcH6w_0qyA","d":"L8GPC5Uq-uileoE_OBZECpJ3SwbUvpkI3jz7XWBGYmY"}'))));
+    expect(result.stringContent, teststring);
+  });
+
+  test('Decrypt JWE from cjose using ECDH-ES with brainpool key', () async {
+    var jweb2 = JsonWebEncryption.fromCompactSerialization(
+        'eyJhbGciOiAiRUNESC1FUyIsICJlbmMiOiAiQTI1NkdDTSIsICJlcGsiOiB7Imt0eSI6ICJFQyIsICJjcnYiOiAiQlAtMjU2IiwgIngiOiAiUWdqajJVYWR4Z3MyQ3lsM1FaN001cDdiM1l4alduNVRfVFpzeHlxNnZaMCIsICJ5IjogIlZFV3N5bzRfWUo2NWsyYVhQRFMwRHRqVmlfQUlTbGZYQWRzSmZNQVduUU0ifX0..ao8KeJlqGobVMCVm.ipdnJwb3V83BjTX-nZ5T7GdK5UobV31NN9BUYXlyX8p_Dvr6iM5-XqsaHhkfVAJW-ZcyB_RU4ITt7okXGdUFk46S4LiYdwdLNBGjHorDubScGCsjurh0X8T2PESpZObx_f3ZmnC4Od2mNL53-i4_eKBx1g063UzBRlAe0xaylTOPFO7A_TnCXe8xUFhUhnL4LkGwsRLH74FeSGOUICsscJuFw7w_phl3hfqm0_8apew3KbVjFx1oHhFLAZiHWsJaV4PeYYX45qm4ckDCHmJFP_MfpNzuBl7AnDLTjTlXzTWZNKcxDdP5N2XYYUPVSUX0GL4U7CtmMGaMqtpwEALBjiX6rf6033BgODzqalS81wc8.g8LnGl39FECcj7Mw_fvbJw');
+    var result = await jweb2.getPayload(JsonWebKeyStore()
+      ..addKey(JsonWebKey.fromJson(jsonDecode(
+          '{"kty":"EC","crv":"BP-256","x":"WBmQdqmB2_l97AfM1X0_rr8T0sty_q8-xXXOrPcIrkk","y":"GiP9hUuoqlHalH45aMlUVwJzWbCCeQbWNFcH6w_0qyA","d":"L8GPC5Uq-uileoE_OBZECpJ3SwbUvpkI3jz7XWBGYmY"}'))));
+    expect(result.stringContent, teststring);
+  });
+  test('Decrypt JWE from jose using ECDH-ES with brainpool key2', () async {
+    var jweb2 = JsonWebEncryption.fromCompactSerialization(
+        'eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiRUNESC1FUyIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IkJQLTI1NiIsIngiOiJSajMxdjVtMU9nR1ZsYlFYWWNpU3duNlNVYXRMQ2V3YXZ0ZkJFaFVTRW00IiwieSI6IkpjMDl0LTJ3MDFvTEpTaTVvUEppTEtSZDkzS2lTVmRWOUVhdDV4RWI4cW8ifX0..M9AE68KPsWqREio7Oy_zsQ.im-mB3TGTuRvFjayXekJSYpe5otqJPhUmTT8xyAsf5JasRg31QP8Rn9CYh2C5PHGRicR9cVhtTbszePUGbhVqG0Qn8a_ctMiy7tZ5OdFKeYIgJTyJMur6N0V6u4RqBcqEKeZcIWpy3938A_LC96wuuo_knSMxTOugdhhUZzRH3OPBbiVGO_BTemStGKqhSwS-B-7Kmn4asOBQAH2OAWkHNTu-DaFMmp7sNJvUEHN9aH2uGaeGH0zoPJ50a0q88gM_qGkjKC8D812yiSEiXVeotyUhusyzhy1sNP49VEv0g8cTfsbH8yA-Z6jwBZqNi_o8Qn7LgbLZ8YUGK2dcswCKbfe7Bi4ALM_39T-HlaWEgAW.ULWqpKgu-soL_Cms48Txrw');
+    var result = await jweb2.getPayload(JsonWebKeyStore()
+      ..addKey(JsonWebKey.fromJson(jsonDecode(
+          '{"kty":"EC","crv":"BP-256","x":"WBmQdqmB2_l97AfM1X0_rr8T0sty_q8-xXXOrPcIrkk","y":"GiP9hUuoqlHalH45aMlUVwJzWbCCeQbWNFcH6w_0qyA","d":"L8GPC5Uq-uileoE_OBZECpJ3SwbUvpkI3jz7XWBGYmY"}'))));
+    expect(result.stringContent, teststring);
+    base64Decode('M9AE68KPsWqREio7Oy_zsQ==').forEach((element) {
+      print('$element, ');
+    });
   });
 }
