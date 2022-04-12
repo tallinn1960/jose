@@ -273,9 +273,15 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
     if (additionalAuthenticatedData != null) {
       aad += '.${String.fromCharCodes(additionalAuthenticatedData!)}';
     }
+
+    var iv = (encryptionAlgorithm != null &&
+            encryptionAlgorithm!.contains(RegExp('A[0-9][0-9}[0-9]GCM')))
+        ? Uint8List.fromList(
+            List.generate(12, (_) => Random.secure().nextInt(256)))
+        : null;
+
     var encryptedData = cek.encrypt(data!,
-        initializationVector: Uint8List.fromList(
-            List.generate(12, (_) => Random.secure().nextInt(256))),
+        initializationVector: iv,
         additionalAuthenticatedData: Uint8List.fromList(aad.codeUnits));
     return JsonWebEncryption._(encryptedData.data, _recipients,
         protectedHeader: protectedHeader,
