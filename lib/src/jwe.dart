@@ -275,7 +275,7 @@ class JsonWebEncryptionBuilder extends JoseObjectBuilder<JsonWebEncryption> {
     }
 
     var iv = (encryptionAlgorithm != null &&
-            encryptionAlgorithm!.contains(RegExp('A[0-9][0-9}[0-9]GCM')))
+            encryptionAlgorithm!.contains(RegExp('A[0-9][0-9][0-9]GCM')))
         ? Uint8List.fromList(
             List.generate(12, (_) => Random.secure().nextInt(256)))
         : null;
